@@ -1,0 +1,14 @@
+.message {
+  display: block;
+  font-size: 18px;
+  color: var(--color);
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #edf0f7;
+  text-align: center;
+  width: max-content;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}

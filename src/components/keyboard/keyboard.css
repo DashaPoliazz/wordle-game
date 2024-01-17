@@ -1,0 +1,10 @@
+.keyboard {
+}
+.keyboard__row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.keyboard__row:last-child {
+  margin-bottom: 0px;
+}

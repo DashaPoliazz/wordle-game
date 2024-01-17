@@ -1,0 +1,60 @@
+:root {
+  --char-size: 20px;
+  --doubled-char-size: calc(2 * var(--char-size));
+}
+
+.game__letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #dee1e9;
+  font-size: 28px;
+  font-weight: 700;
+  height: 56px;
+  margin: 3px;
+  text-transform: uppercase;
+  width: 56px;
+  border-radius: 5px;
+  color: #393e4c;
+  background: #fbfcff;
+}
+
+.letter {
+  width: var(--char-size);
+}
+.letter--long {
+  flex: 2;
+}
+.letter--dark {
+  background-color: #dce1ed;
+}
+.letter--keyboard {
+  font-size: 21px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 3px;
+  text-transform: capitalize;
+}
+.letter--selected {
+  animation-name: Popin;
+  animation-duration: 300ms;
+}
+.letter--elsewhere {
+  background-color: yellow;
+}
+.letter--correct {
+  background-color: #79b851;
+  border: 2px solid #79b851;
+  color: #fff;
+}
+@keyframes Popin {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}

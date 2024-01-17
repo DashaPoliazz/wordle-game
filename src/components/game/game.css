@@ -1,0 +1,10 @@
+.game {
+  margin-bottom: 15px;
+}
+.game__row {
+  margin-bottom: 2px;
+  display: flex;
+}
+.game__row:last-child {
+  margin-bottom: 0px;
+}
