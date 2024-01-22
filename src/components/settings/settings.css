@@ -1,0 +1,17 @@
+.settings {
+  width: 100%;
+}
+.settings__top {
+  display: flex;
+  color: #2e3239;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 7px;
+  min-height: 38px;
+  width: 100%;
+  padding: 0 25px;
+  text-align: center;
+  background: #e5ecff;
+  justify-content: space-evenly;
+  align-items: center;
+}

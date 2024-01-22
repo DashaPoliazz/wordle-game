@@ -1,5 +1,8 @@
 .game {
   margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .game__row {
   margin-bottom: 2px;

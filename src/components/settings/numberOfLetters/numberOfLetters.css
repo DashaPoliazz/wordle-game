@@ -1,0 +1,35 @@
+.number-of-letters__title {
+  text-align: center;
+}
+.number-of-letters__numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.number-of-letters__number {
+  font-weight: 400;
+  color: black;
+  background-color: #e9edf7;
+  width: 40px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  border-radius: 5px;
+  transition: all linear 0.2s;
+  cursor: pointer;
+}
+.number-of-letters__number:hover {
+  font-weight: 700;
+  color: #fff;
+  background-color: #6bba6b;
+}
+.number-of-letters__number--active {
+  font-weight: 700;
+  color: #fff;
+  background-color: #6bba6b;
+}
+.number-of-letters__number:last-child {
+  margin-right: 0;
+}

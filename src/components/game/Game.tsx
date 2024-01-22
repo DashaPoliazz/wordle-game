@@ -12,21 +12,32 @@ import { getCommonChars } from "../../utils/getCommonChars";
 import { getCorrectPositionOfLetters } from "../../utils/getCorrectPositionOfLetters";
 import { isGameEnd } from "../../utils/isGameEnd";
 import Message from "../message/Message";
-import { MESSAGE_TYPE } from "../../types/MessageType";
+import { MESSAGE_TYPE, Maybe } from "../../types/MessageType";
+import { isValidKeyboardChar } from "../../utils/isValidKeyboardChar";
 
-type Props = {};
-type Maybe<T> = T | null;
+type Props = {
+  secretWord: string;
+};
 
 const WORD_LENGTH = 6;
 const DEFAULT_ROWS_AMOUNT = 6;
 const DEFAULT_COLS_AMOUNT = 6;
+const BACKSPACE_KEYDOWN = "Backspace";
 
-export const Game = (props: Props) => {
-  const [randomWord, setRandomWord] = useState("");
-  const [wordMatrix, setWordMatrix] = useState<string[][]>([]);
+// TODO:
+// [ ] 1. Remove ugly "as" typecasts.
+// [ ] 2. Decompose component.
+// [ ] 3. Do transitions between rows only if word is valid
+// [ ] 4. Implement settings (wordLength, highlighting setting, language)
+// [ ] 5. Implement loader for fetching word
+// [ ] 6. Rename vaiables semanthically
+
+export const Game = ({ secretWord }: Props) => {
+  const [wordMatrix, setWordMatrix] = useState<Maybe<string>[][]>(() =>
+    createWordMatrix(DEFAULT_ROWS_AMOUNT, DEFAULT_COLS_AMOUNT)
+  );
   const [rowPointer, setRowPointer] = useState(0);
   const [colPointer, setColPointer] = useState(0);
-  const [commonChars, setCommonChars] = useState<string[]>([]);
   const [revealedChars, setRevealedChars] = useState<string[]>([]);
   const [charsOnCorrectPositions, setCharsOnCorrectPositions] = useState<
     string[][]
@@ -39,18 +50,52 @@ export const Game = (props: Props) => {
   const rowRef = usePrevious(rowPointer);
   const prevRowPointer = rowRef.current;
 
-  // Inititialize state
-  useEffect(() => {
-    const wordMatrix = createWordMatrix(
-      DEFAULT_ROWS_AMOUNT,
-      DEFAULT_COLS_AMOUNT
-    );
-    setWordMatrix(wordMatrix);
-    fetchRandomWord(WORD_LENGTH).then(setRandomWord);
-  }, []);
-
+  // Keydown handler
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
+      if (isGameOver) {
+        window.removeEventListener("keydown", handleKeydown);
+        return;
+      }
+
+      let newRowPointer, newColPointer;
+      const isValidChar = isValidKeyboardChar(e.key);
+
+      if (e.key === BACKSPACE_KEYDOWN) {
+        const { newRow, newCol } = handleBackspace();
+        newRowPointer = newRow;
+        newColPointer = newCol;
+      } else if (isValidChar) {
+        const { newRow, newCol } = handleRegularKey(e.key);
+        newRowPointer = newRow;
+        newColPointer = newCol;
+      } else {
+        console.log(e.key);
+        return;
+      }
+
+      setRowPointer(newRowPointer);
+      setColPointer(newColPointer);
+    };
+
+    const handleBackspace = () => {
+      let newRowPointer = rowPointer;
+      let newColPointer = colPointer === 0 ? colPointer : colPointer - 1;
+
+      const newWordMatrix = modifyMatrix(
+        copyMatrix(wordMatrix),
+        rowPointer,
+        colPointer,
+        ""
+      );
+
+      setWordMatrix(newWordMatrix);
+      setSelectedLetter(null);
+
+      return { newRow: newRowPointer, newCol: newColPointer };
+    };
+
+    const handleRegularKey = (key: string) => {
       let newRowPointer =
         colPointer === DEFAULT_COLS_AMOUNT - 1 ? rowPointer + 1 : rowPointer;
       let newColPointer =
@@ -60,19 +105,14 @@ export const Game = (props: Props) => {
         copyMatrix(wordMatrix),
         rowPointer,
         colPointer,
-        e.key
+        key
       );
 
       setWordMatrix(newWordMatrix);
-      setRowPointer(newRowPointer);
-      setColPointer(newColPointer);
-      setSelectedLetter(e.key);
-    };
+      setSelectedLetter(key);
 
-    if (isGameOver) {
-      window.removeEventListener("keydown", handleKeydown);
-      return;
-    }
+      return { newRow: newRowPointer, newCol: newColPointer };
+    };
 
     window.addEventListener("keydown", handleKeydown);
 
@@ -87,13 +127,12 @@ export const Game = (props: Props) => {
       prevRowPointer !== null ? wordMatrix[prevRowPointer] : null;
 
     if (guessedWord) {
-      const commonChars = getCommonChars(guessedWord, randomWord);
-      setCommonChars(commonChars);
+      const commonChars = getCommonChars(guessedWord as string[], secretWord);
       setRevealedChars(revealedChars.concat(commonChars));
 
       const correctPositions = getCorrectPositionOfLetters(
-        guessedWord,
-        randomWord
+        guessedWord as string[],
+        secretWord
       );
       const newCharsOnCorrectPositions = modifyMatrixRow(
         copyMatrix(charsOnCorrectPositions),
@@ -101,15 +140,24 @@ export const Game = (props: Props) => {
         correctPositions
       );
       setCharsOnCorrectPositions(newCharsOnCorrectPositions);
-      if (isGameEnd(guessedWord, randomWord)) {
-        console.log(isGameEnd(guessedWord, randomWord));
-        setIsGameWin(true);
-        setIsGameOver(true);
-      }
     }
   }, [rowPointer, prevRowPointer]);
 
-  // Other computattions
+  // Handle end of the game
+  useEffect(() => {
+    const guessedWord = wordMatrix[rowPointer - 1];
+    if (!guessedWord) return;
+    const isWordDecoded = isGameEnd(guessedWord as string[], secretWord);
+    if (isWordDecoded) {
+      setIsGameWin(true);
+      setIsGameOver(true);
+    } else if (rowPointer === DEFAULT_ROWS_AMOUNT) {
+      setIsGameWin(false);
+      setIsGameOver(true);
+    }
+  }, [rowPointer, colPointer]);
+
+  // Computattions
   const isSelected = (row: number, col: number) =>
     wordMatrix[row][col] === selectedLetter;
   const letterElsewhere = (char: string) => {
@@ -126,19 +174,24 @@ export const Game = (props: Props) => {
   return (
     <>
       <div className="game">
-        {wordMatrix.map((row, rowIdx) => (
-          <div className="game__row" key={uuidv4()}>
-            {row.map((_, colIdx) => (
-              <Letter
-                key={uuidv4()}
-                char={wordMatrix[rowIdx][colIdx]}
-                isSelected={isSelected(rowIdx, colIdx)}
-                letterElsewhere={letterElsewhere(wordMatrix[rowIdx][colIdx])}
-                letterCorrect={isCharOnCorrectPosition(rowIdx, colIdx)}
-              />
-            ))}
-          </div>
-        ))}
+        <div className="game__rows">
+          {wordMatrix.map((row, rowIdx) => (
+            <div className="game__row" key={uuidv4()}>
+              {row.map((_, colIdx) => {
+                const char = wordMatrix[rowIdx][colIdx] as string;
+                return (
+                  <Letter
+                    key={uuidv4()}
+                    char={char}
+                    isSelected={isSelected(rowIdx, colIdx)}
+                    letterElsewhere={letterElsewhere(char)}
+                    letterCorrect={isCharOnCorrectPosition(rowIdx, colIdx)}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
 
       {isGameOver && isGameWin && <Message type={MESSAGE_TYPE.WIN} />}

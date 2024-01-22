@@ -1,6 +1,5 @@
 import cN from "classnames";
 import "./letter.css";
-import { useState } from "react";
 
 type Maybe<T> = T | null;
 
