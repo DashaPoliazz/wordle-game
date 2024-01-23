@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import "./game.css";
 import { createWordMatrix } from "../../utils/createWordMatrix";
 import { Keyboard } from "../keyboard/Keyboard";
-import { fetchRandomWord } from "../../utils/fetchRandomWord";
 import { copyMatrix } from "../../utils/copyMatrix";
 import { modifyMatrix, modifyMatrixRow } from "../../utils/modifyMatrix";
 import { usePrevious } from "../../hooks/usePrevious";
@@ -12,14 +11,13 @@ import { getCommonChars } from "../../utils/getCommonChars";
 import { getCorrectPositionOfLetters } from "../../utils/getCorrectPositionOfLetters";
 import { isGameEnd } from "../../utils/isGameEnd";
 import Message from "../message/Message";
-import { MESSAGE_TYPE, Maybe } from "../../types/MessageType";
+import { MESSAGE_TYPE, Maybe } from "../../types/types";
 import { isValidKeyboardChar } from "../../utils/isValidKeyboardChar";
 
 type Props = {
   secretWord: string;
 };
 
-const WORD_LENGTH = 6;
 const DEFAULT_ROWS_AMOUNT = 6;
 const DEFAULT_COLS_AMOUNT = 6;
 const BACKSPACE_KEYDOWN = "Backspace";

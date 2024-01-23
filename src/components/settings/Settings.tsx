@@ -2,34 +2,28 @@ import NumberOfLetters from "./numberOfLetters/NumberOfLetters";
 import OptionBlock from "./optionblock/OptionBlock";
 import { v4 as uuidv4 } from "uuid";
 import "./settings.css";
-import { IConfigOption } from "../../types/MessageType";
+import { useActions } from "../../hooks/useActions";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
-type Props = {
-  onConfigChange: (title: string) => void;
-  options: IConfigOption[];
-  wordLength: number;
-  onWordLengthChange: (len: number) => void;
-};
+type Props = {};
 
-const Settings = ({
-  onConfigChange,
-  options,
-  wordLength,
-  onWordLengthChange,
-}: Props) => {
+const Settings = ({}: Props) => {
+  const { options } = useAppSelector((state) => state.settings);
+  const { setWordLength } = useActions();
+
+  const handleWordLengthChange = (wordLength: number) => {
+    setWordLength(wordLength);
+  };
+
   return (
     <div className="settings">
-      <NumberOfLetters
-        wordLength={wordLength}
-        onWordLengthChange={onWordLengthChange}
-      />
-      {options.map((option) => (
+      <NumberOfLetters onWordLengthChange={handleWordLengthChange} />
+      {options.map(({ title, description, isChecked }) => (
         <OptionBlock
+          title={title}
+          description={description}
+          isChecked={isChecked}
           key={uuidv4()}
-          onOptionChange={onConfigChange}
-          title={option.title}
-          description={option.description}
-          isChecked={option.isChecked}
         />
       ))}
     </div>

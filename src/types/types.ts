@@ -1,5 +1,3 @@
-import { Interface } from "readline";
-
 export enum MESSAGE_TYPE {
   WIN = "WIN",
   LOSE = "LOSE",

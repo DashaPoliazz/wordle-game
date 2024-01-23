@@ -1,5 +1,5 @@
 import "./message.css";
-import { MESSAGE_TYPE } from "../../types/MessageType";
+import { MESSAGE_TYPE } from "../../types/types";
 
 type Props = {
   type: MESSAGE_TYPE;

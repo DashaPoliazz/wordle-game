@@ -1,56 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import "./styles.css";
-import { fetchRandomWord } from "./utils/fetchRandomWord";
 import { Game } from "./components/game/Game";
-import Settings from "./components/settings/Settings";
-import { IConfigOption } from "./types/MessageType";
-import { DEFAULT_OPTIONS } from "./utils/defaultOptions";
 import Modal from "./components/modal/Modal";
-
-const DEFAULT_SECRET_WORD_LENGTH = 6;
-
-// Todo:
-//  (maybe take redux?)
-// Should app component know smth about settings?
-// [ ] 1. Unify config (add ability to add another settings);
-// [ ] 2. Move 'wordLength' to config;
+import { useAppSelector } from "./hooks/useAppSelector";
+import { useActions } from "./hooks/useActions";
+import { fetchRandomWord } from "./utils/fetchRandomWord";
+import Settings from "./components/settings/Settings";
 
 function App() {
-  const [isModal, setIsModal] = useState(true);
-  const [secretWord, setSecretWord] = useState("");
-  const [wordLength, setWordLength] = useState(DEFAULT_SECRET_WORD_LENGTH);
-  const [config, setConfig] = useState<IConfigOption[]>(DEFAULT_OPTIONS);
+  const [randomWord, setRandomWord] = useState("");
 
-  const handleConfigChange = (title: string) => {
-    setConfig((prevOptions) => {
-      return prevOptions.map((option) => {
-        return option.title === title
-          ? { ...option, isChecked: !option.isChecked }
-          : option;
-      });
-    });
-  };
-  const handleWordLengthChange = (len: number) => setWordLength(len);
+  const { isModal } = useAppSelector((state) => state.modal);
+  const { wordLength } = useAppSelector((state) => state.settings);
+  const { toggleModal } = useActions();
 
   useEffect(() => {
-    fetchRandomWord(wordLength).then(setSecretWord);
+    fetchRandomWord(wordLength).then(setRandomWord);
   }, [wordLength]);
-
-  const settingsComponent = () => (
-    <Settings
-      onConfigChange={handleConfigChange}
-      options={config}
-      wordLength={wordLength}
-      onWordLengthChange={handleWordLengthChange}
-    />
-  );
 
   return (
     <div className="container">
+      <header className="header">
+        <div className="header__left"></div>
+        <div className="header__right">
+          <button className="header__button" onClick={() => toggleModal()}>
+            Settings
+          </button>
+        </div>
+      </header>
       {isModal &&
-        createPortal(<Modal children={settingsComponent()} />, document.body)}
-      <Game secretWord={secretWord} />
+        createPortal(<Modal children={<Settings />} />, document.body)}
+      <Game secretWord={randomWord} />
     </div>
   );
 }

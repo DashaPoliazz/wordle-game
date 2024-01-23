@@ -1,4 +1,4 @@
-export const DEFAULT_OPTIONS = [
+export const getDefaultOptions = () => [
   {
     title: "Hard Mode",
     description: "Any revealed hints must be used in subsequent guesses",

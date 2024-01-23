@@ -1,18 +1,20 @@
 import { useEffect } from "react";
 import "./optionBlock.css";
+import { useActions } from "../../../hooks/useActions";
 
 type Props = {
   title: string;
   description: string;
   isChecked: boolean;
-  onOptionChange: (title: string) => void;
 };
 
 const OptionBlock = (props: Props) => {
-  const { title, description, isChecked, onOptionChange } = props;
+  const { title, description, isChecked } = props;
+
+  const { toggleOption } = useActions();
 
   const handleOptionClick = () => {
-    onOptionChange(title);
+    toggleOption(title);
   };
 
   return (

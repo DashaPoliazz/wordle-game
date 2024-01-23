@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import cN from "classnames";
 import { v4 as uuidv4 } from "uuid";
 import "./numberOfLetters.css";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
 type Props = {
   numbers?: number[];
-  wordLength: number;
   onWordLengthChange: (len: number) => void;
 };
 
@@ -24,9 +24,10 @@ const generateDefaultLengthes = (start: number, end: number) => {
 
 const NumberOfLetters = ({
   numbers = DEFAULT_LENGTHES,
-  wordLength,
   onWordLengthChange,
 }: Props) => {
+  const { wordLength } = useAppSelector((state) => state.settings);
+
   const handleNumberClick = (n: number) => {
     onWordLengthChange(n);
   };
