@@ -1,23 +1,12 @@
 export const getDefaultOptions = () => [
   {
-    title: "Hard Mode",
-    description: "Any revealed hints must be used in subsequent guesses",
+    title: "Hard mode",
+    description: "Turning off color hints and 'Backspace' button",
     isChecked: false,
   },
   {
-    title: "Dark Mode",
-    description: "Change dark and light mode",
-    isChecked: false,
-  },
-  {
-    title: "Color Blind",
-    description: "High contrast colors",
-    isChecked: false,
-  },
-  {
-    title: "Letters Hints",
-    description:
-      "Hint above the letter that it appears twice or more in the hidden word",
+    title: "Light mode",
+    description: "Guess the word from the random-positioned letters",
     isChecked: false,
   },
   {
@@ -32,3 +21,6 @@ export const getDefaultOptions = () => [
     isChecked: false,
   },
 ];
+
+const options = getDefaultOptions();
+export const titles = options.map((o) => o.title);

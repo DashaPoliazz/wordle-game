@@ -48,6 +48,10 @@
   border: 2px solid #79b851;
   color: #fff;
 }
+.letter--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 @keyframes Popin {
   0% {
     transform: scale(0.8);

@@ -13,14 +13,20 @@ import { isGameEnd } from "../../utils/isGameEnd";
 import Message from "../message/Message";
 import { MESSAGE_TYPE, Maybe } from "../../types/types";
 import { isValidKeyboardChar } from "../../utils/isValidKeyboardChar";
+import {
+  BACKSPACE_KEYDOWN,
+  DEFAULT_ROWS_AMOUNT,
+  HARD_MODE_TITLE,
+  LIGHT_MODE_TITLE,
+} from "../../constants";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { fetchRandomWord } from "../../utils/fetchRandomWord";
+import { shuffleWord } from "../../utils/shuffleWord";
 
 type Props = {
-  secretWord: string;
+  win: boolean;
+  onWin: (state: boolean) => void;
 };
-
-const DEFAULT_ROWS_AMOUNT = 6;
-const DEFAULT_COLS_AMOUNT = 6;
-const BACKSPACE_KEYDOWN = "Backspace";
 
 // TODO:
 // [ ] 1. Remove ugly "as" typecasts.
@@ -29,10 +35,15 @@ const BACKSPACE_KEYDOWN = "Backspace";
 // [ ] 4. Implement settings (wordLength, highlighting setting, language)
 // [ ] 5. Implement loader for fetching word
 // [ ] 6. Rename vaiables semanthically
+// [ ] 7. Rows amount depends on hard mode
 
-export const Game = ({ secretWord }: Props) => {
+export const Game = ({ win, onWin }: Props) => {
+  const { wordLength } = useAppSelector((state) => state.settings);
+  const { options } = useAppSelector((state) => state.settings);
+
+  const [secretWord, setSecretWord] = useState("");
   const [wordMatrix, setWordMatrix] = useState<Maybe<string>[][]>(() =>
-    createWordMatrix(DEFAULT_ROWS_AMOUNT, DEFAULT_COLS_AMOUNT)
+    createWordMatrix(DEFAULT_ROWS_AMOUNT, wordLength)
   );
   const [rowPointer, setRowPointer] = useState(0);
   const [colPointer, setColPointer] = useState(0);
@@ -41,12 +52,30 @@ export const Game = ({ secretWord }: Props) => {
     string[][]
   >([]);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [isGameWin, setIsGameWin] = useState(false);
 
   const [selectedLetter, setSelectedLetter] = useState<Maybe<string>>(null);
 
   const rowRef = usePrevious(rowPointer);
   const prevRowPointer = rowRef.current;
+  const lightModeOption = options.find((o) => o.title === LIGHT_MODE_TITLE);
+  const isLightModeOpiton = lightModeOption?.isChecked;
+
+  // build new matrix on new word length
+  useEffect(() => {
+    fetchRandomWord(wordLength).then((secretWord) => {
+      const newWordMatrix = createWordMatrix(
+        DEFAULT_ROWS_AMOUNT,
+        secretWord.length
+      );
+      if (isLightModeOpiton) {
+        const shuffledWord = [...shuffleWord(secretWord)];
+        modifyMatrixRow(newWordMatrix, 0, shuffledWord);
+        setRowPointer(rowPointer + 1);
+      }
+      setWordMatrix(newWordMatrix);
+      setSecretWord(secretWord);
+    });
+  }, [wordLength, isLightModeOpiton]);
 
   // Keydown handler
   useEffect(() => {
@@ -95,9 +124,9 @@ export const Game = ({ secretWord }: Props) => {
 
     const handleRegularKey = (key: string) => {
       let newRowPointer =
-        colPointer === DEFAULT_COLS_AMOUNT - 1 ? rowPointer + 1 : rowPointer;
+        colPointer === secretWord.length - 1 ? rowPointer + 1 : rowPointer;
       let newColPointer =
-        colPointer === DEFAULT_COLS_AMOUNT - 1 ? 0 : colPointer + 1;
+        colPointer === secretWord.length - 1 ? 0 : colPointer + 1;
 
       const newWordMatrix = modifyMatrix(
         copyMatrix(wordMatrix),
@@ -147,10 +176,10 @@ export const Game = ({ secretWord }: Props) => {
     if (!guessedWord) return;
     const isWordDecoded = isGameEnd(guessedWord as string[], secretWord);
     if (isWordDecoded) {
-      setIsGameWin(true);
+      onWin(true);
       setIsGameOver(true);
     } else if (rowPointer === DEFAULT_ROWS_AMOUNT) {
-      setIsGameWin(false);
+      onWin(true);
       setIsGameOver(true);
     }
   }, [rowPointer, colPointer]);
@@ -192,8 +221,8 @@ export const Game = ({ secretWord }: Props) => {
         </div>
       </div>
 
-      {isGameOver && isGameWin && <Message type={MESSAGE_TYPE.WIN} />}
-      {isGameOver && !isGameWin && <Message type={MESSAGE_TYPE.LOSE} />}
+      {isGameOver && win && <Message type={MESSAGE_TYPE.WIN} />}
+      {isGameOver && !win && <Message type={MESSAGE_TYPE.LOSE} />}
 
       <Keyboard />
     </>

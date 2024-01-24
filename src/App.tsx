@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import "./styles.css";
+import "./styles/styles.css";
 import { Game } from "./components/game/Game";
+import ReactConfetti from "react-confetti";
 import Modal from "./components/modal/Modal";
 import { useAppSelector } from "./hooks/useAppSelector";
 import { useActions } from "./hooks/useActions";
-import { fetchRandomWord } from "./utils/fetchRandomWord";
 import Settings from "./components/settings/Settings";
+import { useWindowSize } from "./hooks/useWindowSize";
 
 function App() {
-  const [randomWord, setRandomWord] = useState("");
-
+  const { width, height } = useWindowSize();
   const { isModal } = useAppSelector((state) => state.modal);
-  const { wordLength } = useAppSelector((state) => state.settings);
   const { toggleModal } = useActions();
-
-  useEffect(() => {
-    fetchRandomWord(wordLength).then(setRandomWord);
-  }, [wordLength]);
+  const [win, setWin] = useState(false);
 
   return (
     <div className="container">
+      {win && <ReactConfetti tweenDuration={5000} recycle={false} />}
       <header className="header">
         <div className="header__left"></div>
         <div className="header__right">
@@ -31,7 +28,7 @@ function App() {
       </header>
       {isModal &&
         createPortal(<Modal children={<Settings />} />, document.body)}
-      <Game secretWord={randomWord} />
+      <Game win={win} onWin={setWin} />
     </div>
   );
 }

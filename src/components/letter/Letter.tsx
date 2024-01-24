@@ -1,5 +1,7 @@
 import cN from "classnames";
 import "./letter.css";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { HARD_MODE_TITLE } from "../../constants";
 
 type Maybe<T> = T | null;
 
@@ -21,7 +23,13 @@ export const Letter = ({
   letterElsewhere,
   letterCorrect,
 }: Props) => {
+  const { options } = useAppSelector((state) => state.settings);
+
   const isLongLetter = char === ENTER || char === BACKSPACE;
+  const hardModeOption = options.find((o) => o.title === HARD_MODE_TITLE);
+  const isHardModeActive = hardModeOption?.isChecked;
+  const isBackspaceButton = char === BACKSPACE;
+  const isLetterDisabled = isBackspaceButton && isHardModeActive;
 
   return (
     <div
@@ -30,8 +38,9 @@ export const Letter = ({
         "letter--keyboard": isKeyboardLetter,
         "letter--dark": isKeyboardLetter,
         "letter--selected": isSelected,
-        "letter--elsewhere": letterElsewhere,
+        "letter--elsewhere": letterElsewhere && !isHardModeActive,
         "letter--correct": letterCorrect,
+        "letter--disabled": isLetterDisabled,
       })}
     >
       {char}
