@@ -4,3 +4,6 @@ export const DEFAULT_COLS_AMOUNT = 6;
 export const BACKSPACE_KEYDOWN = "Backspace";
 export const HARD_MODE_TITLE = "Hard mode";
 export const LIGHT_MODE_TITLE = "Light mode";
+export const GUIDANCE__WORD = "TABLE";
+export const CLOSE_WORD_GUESS = "FLASH";
+export const CORRECT_GUESS = "FLAME";

@@ -1,0 +1,37 @@
+.info__article {
+  text-align: center;
+}
+.info__text {
+  margin-bottom: 10px;
+}
+.info__example {
+  display: flex;
+  margin-bottom: 10px;
+}
+.info__divider {
+  margin-bottom: 5px;
+}
+.info__explanation {
+  background-color: #313448;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.info--grey-text {
+  background-color: #656780;
+  color: #fff !important;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.info--yellow-text {
+  color: #fff !important;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #f3c237;
+}
+.info--green-text {
+  color: #fff !important;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #79b851;
+}

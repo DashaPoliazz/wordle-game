@@ -9,6 +9,7 @@
 }
 
 .modal {
+  color: #dfe1f3;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -22,8 +23,16 @@
   padding: 1.6rem 3rem;
   border: 3px solid black;
   border-radius: 5px;
-  background: white;
-  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+  background: #13141c;
+  box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.333);
+}
+.modal__title {
+  text-align: center;
+  padding: 10px;
+  font-size: 20px;
+  width: 100%;
+  background-color: #313448;
+  border-radius: 7px;
 }
 .message {
   font-size: 1.1rem;

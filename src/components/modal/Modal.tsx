@@ -3,17 +3,14 @@ import "./modal.css";
 
 type Props = {
   children: ReactNode;
+  title: string;
 };
 
-const Modal = ({ children }: Props) => {
+const Modal = ({ children, title }: Props) => {
   return (
     <div className="modal">
-      <p className="message">Settings</p>
+      <p className="modal__title">{title}</p>
       <div className="modal__content">{children}</div>
-      <div className="options">
-        <button className="btn">Yes</button>
-        <button className="btn">No</button>
-      </div>
     </div>
   );
 };

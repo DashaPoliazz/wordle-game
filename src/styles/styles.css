@@ -13,14 +13,27 @@
 
 body {
   position: relative;
+  background-color: #13141c;
 }
 
 .container {
-  /* height: 100vh; */
-  /* display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; */
   max-width: 600px;
   margin: 0 auto;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+.header__button {
+  color: #dfe1f3;
+  background-color: #40445c;
+  transition: 0.2s linear;
+  cursor: pointer;
+  margin-right: 5px;
+}
+.header__button:hover {
+  color: #7bd27b;
+  background: #2a402f;
 }

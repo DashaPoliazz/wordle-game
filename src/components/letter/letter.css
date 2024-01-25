@@ -29,6 +29,8 @@
   background-color: #dce1ed;
 }
 .letter--keyboard {
+  color: #fff !important;
+  background-color: #656780 !important;
   font-size: 21px;
   border-radius: 4px;
   cursor: pointer;
@@ -41,11 +43,13 @@
   animation-duration: 300ms;
 }
 .letter--elsewhere {
-  background-color: yellow;
+  background-color: #f3c237 !important;
+  border: 2px solid #f3c237 !important;
+  color: #fff !important;
 }
 .letter--correct {
-  background-color: #79b851;
-  border: 2px solid #79b851;
+  background-color: #79b851 !important;
+  border: 2px solid #79b851 !important;
   color: #fff;
 }
 .letter--disabled {

@@ -16,7 +16,6 @@ import { isValidKeyboardChar } from "../../utils/isValidKeyboardChar";
 import {
   BACKSPACE_KEYDOWN,
   DEFAULT_ROWS_AMOUNT,
-  HARD_MODE_TITLE,
   LIGHT_MODE_TITLE,
 } from "../../constants";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -27,15 +26,6 @@ type Props = {
   win: boolean;
   onWin: (state: boolean) => void;
 };
-
-// TODO:
-// [ ] 1. Remove ugly "as" typecasts.
-// [ ] 2. Decompose component.
-// [ ] 3. Do transitions between rows only if word is valid
-// [ ] 4. Implement settings (wordLength, highlighting setting, language)
-// [ ] 5. Implement loader for fetching word
-// [ ] 6. Rename vaiables semanthically
-// [ ] 7. Rows amount depends on hard mode
 
 export const Game = ({ win, onWin }: Props) => {
   const { wordLength } = useAppSelector((state) => state.settings);
@@ -52,6 +42,7 @@ export const Game = ({ win, onWin }: Props) => {
     string[][]
   >([]);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isGameInProcess, setIsGameInProcess] = useState(false);
 
   const [selectedLetter, setSelectedLetter] = useState<Maybe<string>>(null);
 
@@ -85,19 +76,20 @@ export const Game = ({ win, onWin }: Props) => {
         return;
       }
 
+      const key = e.key;
       let newRowPointer, newColPointer;
-      const isValidChar = isValidKeyboardChar(e.key);
+      const isValidChar = isValidKeyboardChar(key);
 
-      if (e.key === BACKSPACE_KEYDOWN) {
+      if (key === BACKSPACE_KEYDOWN) {
         const { newRow, newCol } = handleBackspace();
         newRowPointer = newRow;
         newColPointer = newCol;
       } else if (isValidChar) {
-        const { newRow, newCol } = handleRegularKey(e.key);
+        const { newRow, newCol } = handleRegularKey(key);
         newRowPointer = newRow;
         newColPointer = newCol;
       } else {
-        console.log(e.key);
+        console.log(key);
         return;
       }
 
@@ -137,28 +129,65 @@ export const Game = ({ win, onWin }: Props) => {
 
       setWordMatrix(newWordMatrix);
       setSelectedLetter(key);
+      setIsGameInProcess(true);
 
       return { newRow: newRowPointer, newCol: newColPointer };
     };
 
+    const handleKeyboardButtonClick = (e: MouseEvent) => {
+      const clickedElement = e.target as HTMLElement;
+      const isKeyboardLetter =
+        clickedElement.classList.contains("letter--keyboard");
+      if (isKeyboardLetter) {
+        const key = clickedElement.innerHTML;
+        // handler
+        if (isGameOver) {
+          return;
+        }
+
+        let newRowPointer, newColPointer;
+        const isValidChar = isValidKeyboardChar(key);
+
+        if (key === BACKSPACE_KEYDOWN || key === "backspace") {
+          const { newRow, newCol } = handleBackspace();
+          newRowPointer = newRow;
+          newColPointer = newCol;
+        } else if (isValidChar) {
+          const { newRow, newCol } = handleRegularKey(key);
+          newRowPointer = newRow;
+          newColPointer = newCol;
+        } else {
+          console.log(key);
+          return;
+        }
+
+        setRowPointer(newRowPointer);
+        setColPointer(newColPointer);
+      }
+    };
+
+    window.addEventListener("click", handleKeyboardButtonClick);
     window.addEventListener("keydown", handleKeydown);
 
     return () => {
+      window.removeEventListener("click", handleKeyboardButtonClick);
       window.removeEventListener("keydown", handleKeydown);
     };
   }, [rowPointer, colPointer, wordMatrix, isGameOver]);
 
   // Submit word
   useEffect(() => {
-    const guessedWord =
-      prevRowPointer !== null ? wordMatrix[prevRowPointer] : null;
+    let guessedWord =
+      prevRowPointer !== null ? wordMatrix[prevRowPointer].join("") : null;
 
     if (guessedWord) {
-      const commonChars = getCommonChars(guessedWord as string[], secretWord);
+      guessedWord = guessedWord.toLowerCase();
+      const commonChars = getCommonChars(guessedWord, secretWord);
+      console.log(guessedWord);
       setRevealedChars(revealedChars.concat(commonChars));
 
       const correctPositions = getCorrectPositionOfLetters(
-        guessedWord as string[],
+        guessedWord,
         secretWord
       );
       const newCharsOnCorrectPositions = modifyMatrixRow(
@@ -179,7 +208,6 @@ export const Game = ({ win, onWin }: Props) => {
       onWin(true);
       setIsGameOver(true);
     } else if (rowPointer === DEFAULT_ROWS_AMOUNT) {
-      onWin(true);
       setIsGameOver(true);
     }
   }, [rowPointer, colPointer]);
