@@ -103,7 +103,7 @@ export const Game = ({ win, onWin }: Props) => {
       const newWordMatrix = modifyMatrix(
         copyMatrix(wordMatrix),
         rowPointer,
-        colPointer,
+        newColPointer,
         ""
       );
 
