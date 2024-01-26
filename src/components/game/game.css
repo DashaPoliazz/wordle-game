@@ -16,3 +16,7 @@
   background: #191a24;
   border: 2px solid #414458;
 }
+.game__secret-word {
+  color: white;
+  text-align: center;
+}

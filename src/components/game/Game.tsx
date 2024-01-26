@@ -100,7 +100,6 @@ export const Game = ({ win, onWin }: Props) => {
     const handleBackspace = () => {
       let newRowPointer = rowPointer;
       let newColPointer = colPointer === 0 ? colPointer : colPointer - 1;
-
       const newWordMatrix = modifyMatrix(
         copyMatrix(wordMatrix),
         rowPointer,
@@ -178,12 +177,15 @@ export const Game = ({ win, onWin }: Props) => {
   // Submit word
   useEffect(() => {
     let guessedWord =
-      prevRowPointer !== null ? wordMatrix[prevRowPointer].join("") : null;
+      prevRowPointer !== null &&
+      prevRowPointer !== undefined &&
+      prevRowPointer < DEFAULT_ROWS_AMOUNT
+        ? wordMatrix[prevRowPointer].join("")
+        : null;
 
     if (guessedWord) {
       guessedWord = guessedWord.toLowerCase();
       const commonChars = getCommonChars(guessedWord, secretWord);
-      console.log(guessedWord);
       setRevealedChars(revealedChars.concat(commonChars));
 
       const correctPositions = getCorrectPositionOfLetters(
@@ -217,12 +219,14 @@ export const Game = ({ win, onWin }: Props) => {
     wordMatrix[row][col] === selectedLetter;
   const letterElsewhere = (char: string) => {
     if (!char) return false;
-    return revealedChars.includes(char);
+    return revealedChars.includes(char?.toLowerCase());
   };
   const isCharOnCorrectPosition = (rowIdx: number, colIdx: number) => {
     if (!charsOnCorrectPositions[rowIdx]) return false;
+
     return (
-      charsOnCorrectPositions[rowIdx][colIdx] === wordMatrix[rowIdx][colIdx]
+      charsOnCorrectPositions[rowIdx][colIdx]?.toLowerCase() ===
+      wordMatrix[rowIdx][colIdx]?.toLowerCase()
     );
   };
 
@@ -251,6 +255,9 @@ export const Game = ({ win, onWin }: Props) => {
 
       {isGameOver && win && <Message type={MESSAGE_TYPE.WIN} />}
       {isGameOver && !win && <Message type={MESSAGE_TYPE.LOSE} />}
+      {isGameOver && !win && (
+        <p className="game__secret-word">The guessed word '{secretWord}'</p>
+      )}
 
       <Keyboard />
     </>
